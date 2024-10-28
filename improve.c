@@ -1,4 +1,6 @@
-#include "../42/push_swap_final/push_swap.h"
+#include "ps.h"
+
+
 //nine
 void mttp(t_node_stack **stack, t_node_stack *current, size_t median)
 {
@@ -128,11 +130,14 @@ void set_total_price(t_node_stack **b)
 }
 void prepare_stack_b(t_node_stack **a, t_node_stack **b, size_t total_len)
 {
-    reset_stack(*b);
-    actindex(*b);
-    set_price(*b);
-    median_flag(*b, stack_len(*b) / 2);
-    set_target_node_b_test(*a, *b, total_len);
+   
+        reset_stack(*b);
+        actindex(*b);
+        set_price(*b);
+        median_flag(*b, stack_len(*b) / 2);
+        set_target_node_b_test(*a, *b, total_len);
+ 
+   
 }
 
 void prepare_stack_a(t_node_stack **a)
@@ -183,6 +188,24 @@ void case_3_op(t_node_stack **a, t_node_stack **b, t_node_stack *cheapest, t_nod
 }
 void perform_operations(t_node_stack **a, t_node_stack **b, t_node_stack *cheapest, t_node_stack *target)
 {
+    size_t total_len_a;
+
+    if (stack_len(*a) == 3 && stack_len(*b) < 3)
+    {
+        while (*b)
+        {
+            pa(b, a);
+        }
+        total_len_a = stack_len(*a);
+        if (total_len_a <= 5)
+        {
+            if ((*a)->tar_index > (*a)->next->tar_index)
+            {
+                sa(a);
+            }
+        }
+        return;
+    }
     while (cheapest->index != 0 || target->index != 0)
     {
         if (cheapest->index != 0 && target->index == 0)
@@ -414,21 +437,25 @@ void initialize_sorter(t_node_stack **a, size_t *stack_length, t_node_stack **ac
 
 void sort_c_iox(t_node_stack **a, t_node_stack **b, int *c_iox, size_t *stack_length, size_t flag)
 {
-    size_t tmp_len = *stack_length;
-    t_node_stack *actual, *biggest;
-
+    size_t tmp_len;
+    t_node_stack *actual;
+    t_node_stack *biggest;
+    
     initialize_sorter(a, stack_length, &actual, &biggest);
-
+    tmp_len = *stack_length;
     while (tmp_len > 3 && *c_iox != 0)
     {
         actual = process_iteration(a, b, c_iox, &tmp_len, flag);
         if (actual == biggest && flag >= 2)
+        {
             handle_biggest(a, actual, biggest);
-        
+            actual = process_iteration(a, b, c_iox, &tmp_len, flag);
+        }
         process_execution(a, b, c_iox, actual, &tmp_len);
         update_chunk_index(*a, &c_iox, flag);
+        actual = *a;
+        *stack_length = tmp_len;
     }
-    *stack_length = tmp_len;
 }
 
 int first_sort(t_node_stack **a, t_node_stack **b)
@@ -761,7 +788,7 @@ void free_args(char **args)
     free(args);
 }
 
-void process_stack(t_node_stack **a, t_node_stack **b)
+void process_stacker(t_node_stack **a, t_node_stack **b)
 {
     int len;
 
@@ -832,9 +859,11 @@ t_node_stack *find_lowest(t_node_stack *stack)
 
 void initialize_target_indices(t_node_stack *a, size_t *min_index, size_t *max_index)
 {
-    t_node_stack *smallest = find_lowest(a);
-    t_node_stack *biggest = find_biggest(a);
-
+    t_node_stack *smallest;
+    t_node_stack *biggest;  
+    
+    biggest = find_biggest(a); 
+    smallest  = find_lowest(a);
     *min_index = 0;
     *max_index = stack_len(a) - 1;
 
@@ -846,8 +875,9 @@ void initialize_target_indices(t_node_stack *a, size_t *min_index, size_t *max_i
 
 void assign_target_indices(t_node_stack *a, size_t *max_index, int currentMax)
 {
-    t_node_stack *nextBiggest = find_next_bigboy(a, currentMax);
+    t_node_stack *nextBiggest;
 
+    nextBiggest = find_next_bigboy(a, currentMax);
     while (nextBiggest)
     {
         if (nextBiggest->tar_index == 0)
@@ -865,11 +895,12 @@ void target_index(t_node_stack **a)
 {
     size_t min_index;
     size_t max_index;
+    t_node_stack *biggest;
     int currentMax;
 
     initialize_target_indices(*a, &min_index, &max_index);
 
-    t_node_stack *biggest = find_biggest(*a);
+    biggest = find_biggest(*a);
     if (biggest)
     {
         currentMax = biggest->value;
@@ -880,16 +911,18 @@ void target_index(t_node_stack **a)
 
 size_t stack_len(t_node_stack *stack)
 {
-    size_t counter;
+    size_t  counter;
 
     counter = 0;
+    if (!stack)
+        return(0);   
     while (stack)
     {
         stack = stack->next;
-        
+        counter++;
     }
-    return counter;
-}
+    return(counter);
+ }
 
 //second
 bool sorted_stack(t_node_stack *stack)
@@ -946,38 +979,41 @@ static void add_node(t_node_stack **stack, int num)
 
 int ft_dup_err(t_node_stack *a, int num)
 {
-    if (!a)
-        return 1;
-
-    while (a)
-    {
-        if (a->value == num)
-            return 1;
-        a = a->next;
-    }
-    return 0;
+	if(!a)
+		return(0);
+	while (a)
+	{
+		if(a -> value == num)
+			return(1);
+		a = a -> next;
+	}
+	return(0);
 }
 
 static long ft_atol(const char *str)
 {
-    long res = 0;
-    int sign = 1;
+    long res;
+    int sign;
 
-    while (*str == ' ' || *str == '\t' || *str == '\n' ||
-           *str == '\v' || *str == '\f' || *str == '\r')
-        str++;
-    
-    if (*str == '+' || *str == '-')
+    res = 0;
+    sign = 1;
+
+    while (*str == ' ' || *str == '\t' || *str == '\n' || 
+            *str == '\v' || *str == '\f' || *str == '\r')
+    str++;
+    while (*str == '+' || *str == '-')
     {
         if (*str == '-')
+        {
             sign = -1;
+        }
         str++;
     }
-    
-    while (*str >= '0' && *str <= '9')
+    while (*str >= 48 && *str <= 57 && *str)
+    {
         res = res * 10 + (*str++ - '0');
-    
-    return res * sign;
+    }
+    return(res * sign);    
 }
 
 void ft_stack_free(t_node_stack **stack)
@@ -1025,19 +1061,16 @@ int stack_init(t_node_stack **a, char **argv)
     {
         if (ft_syntax_err(argv[i]))
         {
-            ft_stack_free(a);
-            return(0);
+            handle_error(a);
         }
         num = ft_atol(argv[i]);
         if (num < INT_MIN || num > INT_MAX)
         {
-            ft_stack_free(a);
-            return(0);
+            handle_error(a);
         }
         if (ft_dup_err(*a, (int)num))
         {
-            ft_stack_free(a);
-            return(0);
+            handle_error(a);
         }
         add_node(a,(int)num);  
         i++;
@@ -1050,33 +1083,29 @@ int stack_init(t_node_stack **a, char **argv)
 //first
 static char *get_word(char *str, char c, bool yes)
 {
-    static size_t pos;
+    static size_t position = 0;
+    char *next;
     size_t len;
     size_t i;
-    char *next;
-
-    pos = 0;
+    
     len = 0;
     i = 0;
-
-    if (!yes)
-        return NULL;
-
-    while (str[pos] == c)
-        pos++;
-    while (str[pos + len] && str[pos + len] != c)
+    if (yes)
+    {
+        while (str[position] == c)
+        position++;
+        while (str[position + len] != c && str[position + len])
         len++;
-
-    next = malloc((len + 1) * sizeof(char));
-    if (!next)
-        return NULL;
-
-    while (i < len)
-        next[i++] = str[pos++];
-    next[i] = '\0';
-
-    return next;
-}
+        next = malloc(len * sizeof(char) + 1);
+        if(!next)
+            return(NULL);
+         while (str[position] != c && str[position])
+            next[i++] = str[position++];
+        next[i] = '\0';
+        return(next);
+    }
+    return(NULL);
+ }
 
 int ft_printable(char *str)
 {
@@ -1089,26 +1118,29 @@ int ft_printable(char *str)
     return 0;
 }
 
-static size_t word_counter(char *str, char c)
+static size_t   word_counter(char *str, char c)
 {
     size_t counter;
-    bool in_word;
+    bool in_word; 
 
     counter = 0;
-    in_word = false;
-
+    
     while (*str)
     {
-        if (*str != c && !in_word)
+        in_word = false;
+        while (*str == c)
+            str++;
+        while (*str && *str != c)
         {
-            
-            in_word = true;
+            if(!in_word)
+            {
+                counter++;
+                in_word = true;
+            }
+            str++;
         }
-        else if (*str == c)
-            in_word = false;
-        str++;
     }
-    return counter;
+    return(counter);
 }
 
 char **ft_spliter(char *str, char c)
@@ -1123,24 +1155,28 @@ char **ft_spliter(char *str, char c)
     if (word_count <= 0)
         return NULL;
 
-    new_array = malloc(sizeof(char*) * (size_t)(word_count + 1));
+    new_array = malloc(sizeof(char*) * (size_t)(word_count + 2));
     if (!new_array)
-        return NULL;
-
-    while (word_count-- > 0)
+        return(NULL);
+    while (word_count >= 1)
     {
-        new_array[index] = get_word(str, c, ft_printable(str));
-        if (!new_array[index])
+        if (str[index] == 0)
         {
-            while (index > 0)
-                free(new_array[--index]);
-            free(new_array);
-            return NULL;
+            new_array[index] = malloc(sizeof(char));
+			if (new_array[index] == NULL)
+				return (NULL);
+			new_array[index++][0] = '\0';
+			continue ;
         }
+        new_array[index] = get_word(str, c, ft_printable(str));
+       //  write(1, new_array[index], 1);
         index++;
+        word_count--;
+       
+
     }
     new_array[index] = NULL;
-    return new_array;
+    return(new_array);  
 }
 
 void	ft_putstr_fd(char *s, int fd)
@@ -1155,60 +1191,51 @@ void	ft_putstr_fd(char *s, int fd)
 	}
 }
 
-void handle_error(void)
+void handle_error(t_node_stack **a)
 {
+    ft_stack_free(a);
     ft_putstr_fd("Error\n", 2);
+    exit(1);
 }
 
-char **get_arguments(int argc, char **argv)
-{
-    char **args;
+// char **get_arguments(int argc, char **argv)
+// {
+//     char **args;
 
-    if (argc == 2)
-    {
-        args = ft_spliter(argv[1], ' ');
-        if (!args)
-            handle_error();
-        return args;
-    }
-    else
-    {
-        return argv + 1;
-    }
-}
+//     if (argc == 2)
+//     {
+//         args = ft_spliter(argv[1], ' ');
+//         if (!args)
+//             handle_error();
+//         return args;
+//     }
+//     else
+//     {
+//         return argv + 1;
+//     }
+// }
 
 int main(int argc, char **argv)
 {
     t_node_stack *a;
     t_node_stack *b;
-    char **args;
+   // char **args;
 
     a = NULL;
     b = NULL;
 
-    if (argc == 1)
-        return 0;
-    if (argc == 2 && !argv[1][0])
-    {
-        handle_error();
+    if((argc == 1 || (argc == 2 && !argv[1][0])))
         return 1;
-    }
-
-    args = get_arguments(argc, argv);
-    if (!stack_init(&a, args))
-    {
-        handle_error();
-        return 1;
-    }
-    if (argc == 2)
-        free_args(args);
+    argv = ft_spliter(argv[1], ' ');
+    stack_init(&a, argv);
+    // if (argc == 2)
+    //     free_args(argv);
     target_index(&a);
     if (!sorted_stack(a))
-        process_stack(&a, &b);
+        process_stacker(&a, &b);
     actindex(a);
     ft_stack_free(&b);
     ft_stack_free(&a);
 
     return 0;
 }
-
