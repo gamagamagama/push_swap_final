@@ -1,4 +1,4 @@
-#include "push_swap.h"
+#include "../42/push_swap_final/push_swap_main.h"
 int counter = 0;
 //test///
 // void print_stack(t_node_stack *stack) {

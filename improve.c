@@ -1,4 +1,4 @@
-#include "push_swap.h"
+#include "../42/push_swap_final/push_swap.h"
 //fifth
 void three(t_node_stack **a)
 {
