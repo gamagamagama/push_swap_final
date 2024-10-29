@@ -1,4 +1,4 @@
-#include "../42/push_swap_final/push_swap_main.h"
+#include "ps.h"
 int counter = 0;
 //test///
 // void print_stack(t_node_stack *stack) {
@@ -233,6 +233,7 @@ void case_3_op(t_node_stack **a, t_node_stack **b, t_node_stack *cheapest, t_nod
 
 void perform_operations(t_node_stack **a, t_node_stack **b, t_node_stack *cheapest, t_node_stack *target)
 {
+
     while (cheapest->index != 0 || target->index != 0)
     {
         if (cheapest->index != 0 && target->index == 0)
@@ -260,7 +261,29 @@ void psafch(t_node_stack **a, t_node_stack **b, size_t total_len, t_node_stack *
     set_cheapest(*b, total_len, flag);
     *cheapest = retrun_cheapest(*b);
 }
-
+void check_5con(t_node_stack **a, t_node_stack **b, size_t total_len)
+{
+    if (!((a)||(b)))
+    {
+        handle_error(a);
+        handle_error(b);
+    }
+    if (stack_len(*a) == 3 && stack_len(*b) < 3)
+    {
+        while (*b)
+        {
+            pa(b, a);
+        }
+        *b = NULL;
+        if (total_len <= 5)
+        {
+            if ((*a)->tar_index > (*a)->next->tar_index)
+            {
+                sa(a);
+            }
+        }
+    }
+}
 void sort_blok(t_node_stack **a, t_node_stack **b, size_t total_len)
 {
     t_node_stack *target;
@@ -272,7 +295,10 @@ void sort_blok(t_node_stack **a, t_node_stack **b, size_t total_len)
     flag = 3;
     while ((*b) != NULL)
     {
+        check_5con(a, b, total_len);
         psafch(a, b, total_len, &cheapest, flag);
+        if (cheapest == NULL)
+            return;
         target = cheapest->target;
         perform_operations(a, b, cheapest, target);
         if(target->index == 0 && cheapest->index == 0)
@@ -282,7 +308,6 @@ void sort_blok(t_node_stack **a, t_node_stack **b, size_t total_len)
        // chasfe(a, target);
         tmp_len--;
         flag = check_flag(*b, &flag);
-        
     }
 }
 
@@ -515,9 +540,8 @@ void process_execution(t_node_stack **a, t_node_stack **b, int *c_iox, t_node_st
     print_chunks(*a, &(*a)->cx, &(*a)->co, &(*a)->ci);
 }
 
-t_node_stack *process_iteration(t_node_stack **a, t_node_stack **b, int *c_iox, size_t *stack_length, size_t flag)
+t_node_stack *process_iteration(t_node_stack **a, size_t *stack_length, size_t flag)
 {
-    size_t median = *stack_length / 2;
     t_node_stack *cheapest;
     
     actindex(*a);
@@ -540,7 +564,7 @@ void handle_biggest(t_node_stack **a, t_node_stack *actual, t_node_stack *bigges
 void initialize_sorter(t_node_stack **a, size_t *stack_length, t_node_stack **actual, t_node_stack **biggest)
 {
     *biggest = find_biggest(*a);
-    (*biggest)->flag_0_3 == 0;
+    (*biggest)->flag_0_3 = 0;
     *actual = *a;
     *stack_length = stack_len(*a);
 }
@@ -555,11 +579,11 @@ void sort_c_iox(t_node_stack **a, t_node_stack **b, int *c_iox, size_t *stack_le
     tmp_len = *stack_length;
     while (tmp_len > 3 && *c_iox != 0)
     {
-        actual = process_iteration(a, b, c_iox, &tmp_len, flag);
+        actual = process_iteration(a, &tmp_len, flag);
         if (actual == biggest && flag >= 2)
         {
             handle_biggest(a, actual, biggest);
-            actual = process_iteration(a, b, c_iox, &tmp_len, flag);
+            actual = process_iteration(a, &tmp_len, flag);
         }
         process_execution(a, b, c_iox, actual, &tmp_len);
         update_chunk_index(*a, &c_iox, flag);
@@ -746,16 +770,22 @@ void others(t_node_stack **a, t_node_stack **b)
         {
             sort_blok(a, b, total_len);
         }
-        ft_stack_free(b);
         if (!sorted_stack(*a))
         {
             final_sort(a);
         }
-         
+        ft_stack_free(b);
     }
 }
 
 //forth
+void handle_error(t_node_stack **a)
+{
+    ft_stack_free(a);
+    ft_putstr("Error\n");
+    exit(1);
+}
+
 void ft_putstr(char *str)
 {
     size_t count;
@@ -946,7 +976,7 @@ t_node_stack *find_biggest(t_node_stack *stack)
     num = LONG_MIN;
     if (!stack)
         return(NULL);
-    while (stack)
+    while (stack != NULL)
     {
         if(num < (*stack).value)
         {
@@ -993,33 +1023,86 @@ size_t stack_len(t_node_stack *stack)
     return(counter);
  }
 
-void   target_index(t_node_stack **a)
- {
-    size_t min_index = 0;
-    size_t max_index = stack_len(*a) - 1;
-    size_t currentMax;
-    t_node_stack *smallest = find_lowest(*a);
-    t_node_stack *biggest = find_biggest(*a);
-    t_node_stack *current = *a;
+void initialize_target_indices(t_node_stack *a, size_t *min_index, size_t *max_index)
+{
+    t_node_stack *smallest;
+    t_node_stack *biggest;  
+    
+    biggest = find_biggest(a); 
+    smallest  = find_lowest(a);
+    *min_index = 0;
+    *max_index = stack_len(a) - 1;
+
+    if (smallest)
+        smallest->tar_index = *min_index;
+    if (biggest)
+        biggest->tar_index = *max_index;
+}
+
+void assign_target_indices(t_node_stack *a, size_t *max_index, int currentMax)
+{
     t_node_stack *nextBiggest;
 
-    currentMax = (*biggest).value;
-    biggest->tar_index = max_index;
-    smallest->tar_index = min_index;
-    nextBiggest = find_next_bigboy(current, currentMax);
-   while (nextBiggest) {
-        if (nextBiggest->tar_index == 0 && (*current).value == nextBiggest->value) {
-            currentMax = nextBiggest->value;
-            current->tar_index = --max_index;
-            nextBiggest = find_next_bigboy(*a, currentMax);
-            current = *a;
-        }
-        else if (current != NULL)
+    nextBiggest = find_next_bigboy(a, currentMax);
+    while (nextBiggest)
+    {
+        if (nextBiggest->tar_index == 0)
         {
-            current = (*current).next; 
+            currentMax = nextBiggest->value;
+            nextBiggest->tar_index = --(*max_index);
+            nextBiggest = find_next_bigboy(a, currentMax);
         }
+        else
+            a = a->next;
     }
- }
+}
+
+void target_index(t_node_stack **a)
+{
+    size_t min_index;
+    size_t max_index;
+    t_node_stack *biggest;
+    int currentMax;
+
+    initialize_target_indices(*a, &min_index, &max_index);
+
+    biggest = find_biggest(*a);
+    if (biggest)
+    {
+        currentMax = biggest->value;
+        assign_target_indices(*a, &max_index, currentMax);
+    }
+}
+
+
+
+// void   target_index(t_node_stack **a)
+//  {
+//     size_t min_index = 0;
+//     size_t max_index = stack_len(*a) - 1;
+//     size_t currentMax;
+//     t_node_stack *smallest = find_lowest(*a);
+//     t_node_stack *biggest = find_biggest(*a);
+//     t_node_stack *current = *a;
+//     t_node_stack *nextBiggest;
+
+//     currentMax = (*biggest).value;
+//     biggest->tar_index = max_index;
+//     smallest->tar_index = min_index;
+//     nextBiggest = find_next_bigboy(current, currentMax);
+//    while (nextBiggest) {
+//         if (nextBiggest->tar_index == 0 && (*current).value == nextBiggest->value) {
+//             currentMax = nextBiggest->value;
+//             current->tar_index = --max_index;
+//             nextBiggest = find_next_bigboy(*a, currentMax);
+//             current = *a;
+//         }
+//         else if (current != NULL)
+//         {
+//             current = (*current).next; 
+//         }
+//     }
+//  }
 
 //second
 bool sorted_stack(t_node_stack *stack)
@@ -1045,7 +1128,23 @@ t_node_stack *find_last_node(t_node_stack *stack)
         stack = stack->next;
     return(stack);
 }
-
+static void in_node(t_node_stack *node)
+{
+    node->index = 0;
+    node->tar_index = 0;
+    node->node_tar_index = 0;
+    node->cost = 0;
+    node->flag_0_3 = 0;
+    node->cx = 0;
+    node->co = 0;
+    node->ci = 0;
+    node->max = false;
+    node->mid = false;
+    node->min = false;
+    node->def = false;
+    node->abov_median = false;
+    node->cheapest = false;
+}
 static void add_node(t_node_stack **stack, int num)
 {
     t_node_stack *new_node;
@@ -1058,6 +1157,7 @@ static void add_node(t_node_stack **stack, int num)
         return;
     new_node ->next = NULL;
     new_node->value = num;
+    in_node(new_node);
     if (!(*stack)) 
     {
         *stack = new_node;
@@ -1074,7 +1174,7 @@ static void add_node(t_node_stack **stack, int num)
 int ft_dup_err(t_node_stack *a, int num)
 {
 	if(!a)
-		return(1);
+		return(0);
 	while (a)
 	{
 		if(a -> value == num)
@@ -1155,12 +1255,12 @@ void stack_init(t_node_stack **a, char **argv)
     while (argv[i])
     {
         if (ft_syntax_err(argv[i]))
-            ft_stack_free(a);
+            handle_error(a);
         num = ft_atol(argv[i]);
         if (num < INT_MIN || num > INT_MAX)
-            ft_stack_free(a);
+            handle_error(a);
         if (ft_dup_err(*a, (int)num))
-            ft_stack_free(a);
+            handle_error(a);
         add_node(a,(int)num);  
         i++;
     }
@@ -1199,6 +1299,8 @@ static char *get_word(char *str, char c, bool yes)
     bool yes;
 
     yes = false;
+    if(!str)
+        return(0);
     while (*str)
     {
         if (*str >= 32 && *str <= 126)
@@ -1216,7 +1318,8 @@ static size_t   word_counter(char *str, char c)
     bool in_word; 
 
     counter = 0;
-    
+    if (!str)
+        return(0);
     while (*str)
     {
         in_word = false;
@@ -1240,10 +1343,8 @@ char **ft_spliter(char *str, char c)
     size_t index;
     int word_count; 
     char **new_array;
-    int is_printable;
 
     word_count = word_counter(str, c);
-    is_printable = ft_printable(str);
     index = 0;
     if (word_count == 0)
     {
@@ -1262,7 +1363,7 @@ char **ft_spliter(char *str, char c)
 			new_array[index++][0] = '\0';
 			continue ;
         }
-        new_array[index++] = get_word(str, c, is_printable); 
+        new_array[index] = get_word(str, c, ft_printable(str));
         word_count--;
     }
     new_array[index] = NULL;
@@ -1303,7 +1404,7 @@ int main(int argc, char **argv)
     }
     actindex(a);
     // print_stack(a);
-    ft_stack_free(&b);
+   // ft_stack_free(&b);
     ft_stack_free(&a);
     
     return (1);
