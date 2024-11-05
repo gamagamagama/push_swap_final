@@ -6,7 +6,7 @@
 /*   By: matus <matus@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/10 16:05:39 by matus             #+#    #+#             */
-/*   Updated: 2024/11/04 23:41:26 by matus            ###   ########.fr       */
+/*   Updated: 2024/11/05 09:04:55 by matus            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,42 +87,93 @@ void final_sort(t_node_stack **stack)
 
 
 //eight
-static void *set_target_node_b_test(t_node_stack *a, t_node_stack *b, size_t stack_len)
+
+t_node_stack    *find_target_node(t_node_stack *a, t_node_stack *b, size_t stack_length)
 {
-    t_node_stack *current_a;
-    t_node_stack *target_node;
-    size_t    best_index;
-     
-    target_node = NULL;
-    while (b != NULL)
-    {
-        best_index = stack_len;
+        t_node_stack    *current_a;
+        t_node_stack    *target_node;
+        size_t          best_index;
+
+        target_node = NULL;
+        best_index = stack_length;
         current_a = a;
         while (current_a)
         {
-            if ((*current_a).tar_index > (*b).tar_index 
-                && (*current_a).tar_index < best_index)
+            if (current_a->tar_index > b->tar_index
+                && current_a->tar_index < best_index)
             {
-                best_index = (*current_a).tar_index;
+                best_index = current_a->tar_index;
                 target_node = current_a;
             }
-            current_a = (*current_a).next;
+            current_a = current_a->next;
         }
-        if(target_node != NULL)
-        {
-            (*b).node_tar_index = (*target_node).tar_index;
-            (*b).target = (target_node);
-        }
-        b = (*b).next;
+        return (target_node);
     }
-    return target_node;
-}
+
+
+
+void    update_node_tar_index(t_node_stack *b, t_node_stack *target_node)
+    {
+        if (target_node != NULL)
+        {
+            b->node_tar_index = target_node->tar_index;
+            b->target = target_node;
+        }
+    }
+
+
+
+t_node_stack    *set_target_node_b_test(t_node_stack *a, t_node_stack *b, size_t stack_length)
+    {
+        t_node_stack    *target_node;
+
+        while (b != NULL)
+        {
+            target_node = find_target_node(a, b, stack_length);
+            update_node_tar_index(b, target_node);
+            b = b->next;
+        }
+        return (target_node);
+    }
+
+
+
+// static void *set_target_node_b_test(t_node_stack *a, t_node_stack *b, size_t stack_len)
+// {
+//     t_node_stack *current_a;
+//     t_node_stack *target_node;
+//     size_t    best_index;
+     
+//     target_node = NULL;
+//     while (b != NULL)
+//     {
+//         best_index = stack_len;
+//         current_a = a;
+//         while (current_a)
+//         {
+//             if ((*current_a).tar_index > (*b).tar_index 
+//                 && (*current_a).tar_index < best_index)
+//             {
+//                 best_index = (*current_a).tar_index;
+//                 target_node = current_a;
+//             }
+//             current_a = (*current_a).next;
+//         }
+//         if(target_node != NULL)
+//         {
+//             (*b).node_tar_index = (*target_node).tar_index;
+//             (*b).target = (target_node);
+//         }
+//         b = (*b).next;
+//     }
+//     return target_node;
+// }
 
 void median_flag(t_node_stack *stack, size_t median)
 {
     while (stack)
     {
-        if (stack->index >= median)
+        if (stack->index >= median)  //>=
         {
             stack->abov_median = false;
         }
@@ -288,6 +339,14 @@ void check_5con(t_node_stack **a, t_node_stack **b, size_t total_len)
         }
     }
 }
+// void check_test(t_node_stack **b)
+// {
+//     if ((*b)->tar_index < (*b)->next->tar_index)
+//     {
+//         sb(b);
+//     }
+    
+// }
 void sort_blok(t_node_stack **a, t_node_stack **b, size_t total_len)
 {
     t_node_stack *target;
@@ -300,6 +359,7 @@ void sort_blok(t_node_stack **a, t_node_stack **b, size_t total_len)
     while ((*b) != NULL)
     {
         check_5con(a, b, total_len);
+    //    check_test(b);
         psafch(a, b, total_len, flag);
         cheapest = retrun_cheapest(*b);
         if (cheapest == NULL)
@@ -416,9 +476,10 @@ void print_chunks(t_node_stack *stack)
 {
     t_node_stack *current;
     
-    // *cx = stack->cx;
-    // *co = stack->co;
-    // *ci = stack->ci;
+    stack->cx = 0;
+    stack->co = 0;
+    stack->ci = 0;
+  
     current = stack;
     while (current != NULL)
     {
@@ -452,7 +513,7 @@ void push_operation_ci(t_node_stack *cheapest_node, t_node_stack **a, t_node_sta
     }   
     if ((*stack).cheapest)// && ci_iox != 0)
             {
-                if((*cheapest_node).tar_index >= chunk_median)
+                if((*cheapest_node).tar_index >= chunk_median) //lol
                 {
                     pb(a,b);
                      (*tmp_slen_a)--;   
@@ -466,12 +527,17 @@ void push_operation_ci(t_node_stack *cheapest_node, t_node_stack **a, t_node_sta
             }
 }
 
-void rotate_operation_ci(t_node_stack **a, t_node_stack *cheapest, /*int *ci,*/ size_t median)
+void rotate_operation_ci(t_node_stack **a, t_node_stack *cheapest, size_t median)
 {
     t_node_stack *actual;
-   
+  //  int *c_iox;
+   // int initial_value;
+
+    
     actual = *a;
-    while (!(*actual).cheapest) // && *ci != 0)
+    //initial_value = choose_wise(actual, actual->flag_0_3);
+   // *c_iox = initial_value;
+    while (!(*actual).cheapest)//  && *c_iox != 0)
     {
         if ((*cheapest).index < median)
         {
@@ -483,15 +549,15 @@ void rotate_operation_ci(t_node_stack **a, t_node_stack *cheapest, /*int *ci,*/ 
         }
         else if ((*cheapest).index >= median)
         {
-            while (!(*actual).cheapest)// && *ci != 0)
+            while (!(*actual).cheapest )//&& *c_iox != 0)
             {
                 rra(a);
                 actual = *a;
             }
         }
+        //update_chunk_index(*a, &c_iox, actual->flag_0_3);
         actual = *a; 
     }
-    
 }
 
 t_node_stack *retrun_cheapest(t_node_stack *stack)
@@ -520,23 +586,24 @@ void set_cheapest(t_node_stack *stack, size_t total_len, size_t flag)
     mark_as_cheapest(cheapest_node);
 }
 
-void update_chunk_index(t_node_stack *a, int **c, size_t flag)
+void update_chunk_index(t_node_stack *a, int *c, size_t flag)
 {
     if (flag == 1)
     {
-        *c = &a->ci;
+        *c = a->ci;
     }
     else if (flag == 2)
     {
-        *c = &a->co;
+        *c = a->co;
     }
     else if (flag == 3)
     {
-        *c = &a->cx;
+        *c = a->cx;
     }
 }
 void process_execution(t_node_stack **a, t_node_stack **b, /*int *c_iox,*/ t_node_stack *cheapest, size_t *stack_length)
 {
+
     size_t median;
     median = *stack_length / 2;
     rotate_operation_ci(a, cheapest, /*c_iox*/ median);
@@ -589,43 +656,56 @@ int choose_wise(t_node_stack *actual, size_t flag)
     }
     return(0);
 }
+
+int *create_c_iox()
+{
+    int *c_iox;
+
+    c_iox = malloc(sizeof(int));
+    if (!c_iox)
+    {
+        return(NULL);
+    }
+    return(c_iox);
+}
 void sort_c_iox(t_node_stack **a, t_node_stack **b, size_t *stack_length, size_t flag)
 {
     size_t tmp_len;
     t_node_stack *actual;
     t_node_stack *biggest;
-    int *c_ptr;
+    int c_iox;// = choose_wise(*a, flag);
 
+    c_iox = choose_wise(*a, flag);
+    
     initialize_sorter(a, stack_length, &actual, &biggest);
-    *c_ptr = choose_wise(actual, flag);
     tmp_len = *stack_length;
-    while (tmp_len > 3 && *c_ptr != 0)
+  
+    while ( c_iox != 0 && tmp_len > 3)//3 && *c_iox != 0)
     {
         actual = process_iteration(a, &tmp_len, flag);
+        c_iox = choose_wise(*a, flag);
+        if (!actual)
+            return ;
         if (actual == biggest && flag >= 2)
         {
             handle_biggest(a, actual, biggest);
             actual = process_iteration(a, &tmp_len, flag);
         }
-        // update_chunk_index(*a, &c_ptr, flag);
-        // if(c_ptr != 0)
-        // {
-            process_execution(a, b, /*c_iox*/ actual, &tmp_len);
-            update_chunk_index(*a, &c_ptr, flag);
-        //}
+        process_execution(a, b, /*c_iox,*/ actual, &tmp_len);
         actual = *a;
+        update_chunk_index(*a, &c_iox, flag);
         *stack_length = tmp_len;
+      
     }
+
 }
+
 
 int first_sort(t_node_stack **a, t_node_stack **b)
 {
     size_t slen_a;
     size_t tmp_slen_a;
-    int cx;
-    int co;
-    int ci;
-
+  
     slen_a = stack_len(*a);
     tmp_slen_a = slen_a;    
     print_chunks(*a);
@@ -705,11 +785,11 @@ void set_price(t_node_stack *stack)
         if(stack->flag_0_3 < 4 )
         {
             (*stack).cost = (*stack).index;
-            if ((*stack).index < median)
+            if ((*stack).index <= median) //<
             {
                 (*stack).cost = (*stack).cost;
             }
-            else if((*stack).index >= median)
+            else if((*stack).index > median) //>=
             {   
                 (*stack).cost = len_a - (*stack).cost;
               
@@ -1394,13 +1474,13 @@ int main(int argc, char **argv)
 
     a = NULL;
     b = NULL;
-    // if((argc == 1 || (argc == 2 && !argv[1][0])))
-    //     argv = ft_spliter(argv[1], ' ');
-    // stack_init(&a, argv + 1);
-
-     if((argc == 2))
+    if((argc == 1 || (argc == 2 && !argv[1][0])))
         argv = ft_spliter(argv[1], ' ');
-    stack_init(&a, argv);
+    stack_init(&a, argv + 1);
+
+    //  if((argc == 2))
+    //     argv = ft_spliter(argv[1], ' ');
+    // stack_init(&a, argv);
 
     target_index(&a);
     if (!((sorted_stack(a))))
