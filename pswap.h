@@ -6,7 +6,7 @@
 /*   By: matus <matus@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/10 10:03:17 by matus             #+#    #+#             */
-/*   Updated: 2024/11/05 08:41:04 by matus            ###   ########.fr       */
+/*   Updated: 2024/11/05 09:07:20 by matus            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,7 @@ int first_sort(t_node_stack **a, t_node_stack **b);
 // static void set_target_node_b_test(t_node_stack *a, t_node_stack *b, size_t stack_len);
 t_node_stack    *set_target_node_b_test(t_node_stack *a, t_node_stack *b, size_t stack_length);
 void    update_node_tar_index(t_node_stack *b, t_node_stack *target_node);
-//t_node_stack    *find_target_node(t_node_stack *a, t_node_stack *b, size_t stack_length);
+t_node_stack    *find_target_node(t_node_stack *a, t_node_stack *b, size_t stack_length);
 
 
 

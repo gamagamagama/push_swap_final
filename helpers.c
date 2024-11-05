@@ -6,7 +6,7 @@
 /*   By: matus <matus@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/29 17:38:31 by matus             #+#    #+#             */
-/*   Updated: 2024/11/05 07:11:15 by matus            ###   ########.fr       */
+/*   Updated: 2024/11/05 11:02:00 by matus            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,17 +54,15 @@ t_node_stack	*find_cheapest_node(t_node_stack *stack,
 									size_t flag, size_t total_len)
 {
 	size_t			cheapest_index;
-	size_t			tmp_len;
 	t_node_stack	*cheapest_node;
 
 	cheapest_index = total_len;
-	tmp_len = stack_len(stack);
 	cheapest_node = NULL;
 	while (stack)
 	{
 		if (stack->flag_0_3 == flag)
 		{
-			if (is_cheaper(stack, &cheapest_index, cheapest_node, tmp_len))
+			if (is_cheaper(stack, &cheapest_index, cheapest_node))
 			{
 				cheapest_index = stack->cost;
 				cheapest_node = stack;

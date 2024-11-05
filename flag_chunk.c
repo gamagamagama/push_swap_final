@@ -6,7 +6,7 @@
 /*   By: matus <matus@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/29 17:38:15 by matus             #+#    #+#             */
-/*   Updated: 2024/10/29 18:38:24 by matus            ###   ########.fr       */
+/*   Updated: 2024/11/05 10:58:56 by matus            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,18 +69,18 @@ void	defaults(t_node_stack *stack)
 	set_price(stack);
 }
 
-void	update_chunk_index(t_node_stack *a, int **c_iox, size_t flag)
+void	update_chunk_index(t_node_stack *a, int *c, size_t flag)
 {
 	if (flag == 1)
 	{
-		*c_iox = &a->ci;
+		*c = a->ci;
 	}
 	else if (flag == 2)
 	{
-		*c_iox = &a->co;
+		*c = a->co;
 	}
 	else if (flag == 3)
 	{
-		*c_iox = &a->cx;
+		*c = a->cx;
 	}
 }

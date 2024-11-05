@@ -6,7 +6,7 @@
 /*   By: matus <matus@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/29 17:40:23 by matus             #+#    #+#             */
-/*   Updated: 2024/11/05 07:39:36 by matus            ###   ########.fr       */
+/*   Updated: 2024/11/05 10:40:52 by matus            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,7 @@ void	ft_putstr(char *str)
 }
 
 bool	is_cheaper(t_node_stack *current_node, size_t *cheapest_index,
-					t_node_stack *cheapest_node, size_t tmp_len)
+					t_node_stack *cheapest_node)
 {
 	if (current_node->cost < *cheapest_index)
 	{
